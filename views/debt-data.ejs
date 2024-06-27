@@ -1,0 +1,46 @@
+<div class="container mt-3">
+  <div class="row">
+    <div class="col-md-8">
+      <h2>Daftar Hutang</h2>
+      <a href="/notes/add" class="mb-2 btn btn-primary">Tambah Data</a>
+      <% if (msg.length != 0) { %>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          <%= msg %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Pemberi Hutang</th>
+            <th scope="col">Status</th>
+            <th scope="col">Aksi</th>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          <% if (debt.length === 0) { %>
+            <tr>
+              <td colspan="4">
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                  <strong>Data Hutang</strong> masih kosong.
+                </div>
+              </td>
+            </tr>
+          <% } %>
+          <% debt.forEach((Debt, no) => { no++ %>
+           <tr>
+              <th scope="row"><%= no %></th>
+              <td><%= Debt.pemberi %></td>
+              <td><%= Debt.status %></td>
+              <td>
+                <a href="/notes/<%= Debt._id %>" class="badge rounded-pill btn btn-dark"><i class="bi bi-info-circle-fill"></i> Detail</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

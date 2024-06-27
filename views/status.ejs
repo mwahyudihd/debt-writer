@@ -1,0 +1,38 @@
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-12 card m-2 p-3">
+            <h2>Form Ubah Satatus catatan Hutang</h2>
+            <!-- <% //if (typeof errors != 'undefined') { %>
+             <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <ul>
+                    <% //errors.forEach(err => { %>
+                     <li><//%= err.msg %></li>
+                    <% //}) %>
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+             </div>
+            <% //} %> -->
+            <form method="post" action="/notes/<%= debt._id %>?_method=PUT"">
+                <input type=" text" value="<%= debt._id %>" name="_id" hidden readonly>
+                <div class="mb-3 form-floating">
+                    <input type="date" class="form-control" placeholder="lunas_pada" id="lunas_pada"
+                        name="Tanggal lunas" value="<%= dateFormat %>" required>
+                    <label for="lunas_pada" class="form-label">Tanggal lunas</label>
+                </div>
+                <% if (debt.status === "unpaid" ) { %>
+                    <select class="form-select" aria-label="status" name="status" id="status" required>
+                        <option value="unpaid" selected disabled>unpaid</option>
+                        <option value="paid">paid</option>
+                    </select>
+                    <% }else { %>
+                        <select class="form-select" aria-label="status" name="status" id="status" required>
+                            <option value="paid" selected disabled>paid</option>
+                            <option value="unpaid">unpaid</option>
+                        </select>
+                    <% } %>
+                    <input type="text" name="pemberi" value="<%= debt.pemberi %>" hidden readonly>
+                <button type="submit" class="btn btn-primary float-end mt-3">Simpan</button>
+            </form>
+        </div>
+    </div>
+</div>

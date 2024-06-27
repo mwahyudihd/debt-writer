@@ -1,0 +1,43 @@
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-12 card m-2 p-3">
+            <h2>Form Tambah catatan Hutang</h2>
+            <!-- <% //if (typeof errors != 'undefined') { %>
+             <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <ul>
+                    <% //errors.forEach(err => { %>
+                     <li><//%= err.msg %></li>
+                    <% //}) %>
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+             </div>
+            <% //} %> -->
+            <form method="post" action="/notes">
+                <input type="text" value="<%= cekSesi %>" name="pencatat" hidden readonly>
+                <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" placeholder="Pemberi" id="pemberi" name="pemberi" required>
+                    <label for="pemberi" class="form-label">Nama Pemberi Hutang</label>
+                </div>
+                <div class="mb-3 form-floating">
+                  <input type="number" id="jumlah" name="jumlah" placeholder="jumlah" class="form-control" required>
+                  <label for="jumlah" class="form-label">Jumlah Hutang</label>
+                </div>
+                <div class="mb-3 form-floating">
+                    <input type="date" class="form-control" placeholder="Tanggal Hutang" id="tgl_hutang" name="tgl_hutang">
+                    <label for="tgl_hutang" class="form-label">Tanggal Berhutang</label>
+                </div>
+                <div class="mb-3 form-floating">
+                    <input type="date" class="form-control" placeholder="deadline" id="deadline" name="deadline">
+                    <label for="deadline" class="form-label">Tanggal Jatuh Tempo</label>
+                </div>
+                <div class="form-floating mt-3">
+                    <textarea class="form-control" name="catatan" placeholder="Leave a comment here" id="catatan"></textarea>
+                    <label for="catatan">Catatan Optional</label>
+                  </div>
+                <input type="text" class="form-control" name="status" value="unpaid" readonly hidden>
+
+                <button type="submit" class="btn btn-primary float-end mt-3">Simpan</button>
+              </form>
+        </div>
+    </div>
+</div>
