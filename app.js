@@ -10,18 +10,19 @@ const session = require('express-session')
 const expressLayouts = require('express-ejs-layouts')
 const { body, validationResult, check, Result } = require('express-validator')
 const methodOverride = require('method-override')
+require('dotenv').config()
 
 //server init
-const port = 3000
+const port = process.env.PORT || 3000;
 const app = express()
 
-//db config
-mongoose.connect('mongodb://127.0.0.1:27017/db_debtwriter')
+// db config
+mongoose.connect(process.env.MONGODB_URI)
     .then((result) => {
-        console.log('connected to mongodb')
+        console.log('connected to mongodb');
     }).catch((err) => {
-        console.log(err)
-    })
+        console.log(err);
+    });
 
 //setup ejs
 app.set('view engine', 'ejs')

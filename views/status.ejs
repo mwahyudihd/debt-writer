@@ -12,7 +12,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
              </div>
             <% //} %> -->
-            <form method="post" action="/notes/<%= debt._id %>?_method=PUT"">
+            <form method="post" action="/notes/<%= debt._id %>?_method=PUT">
                 <input type=" text" value="<%= debt._id %>" name="_id" hidden readonly>
                 <div class="mb-3 form-floating">
                     <input type="date" class="form-control" placeholder="lunas_pada" id="lunas_pada"
