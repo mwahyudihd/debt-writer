@@ -1,16 +1,33 @@
-
-    <div class="container p-5">
-        <div class="container p-4">
-            <h1>Debt Writer Home Page</h1>
-            <p>Selamat data di Debt Writer....</p>
-            <div class="container col-md-12">
+<% const calculateDaysLeft = (deadline) => { %>
+    <% const now = new Date(); %>
+    <% const timeDiff = new Date(deadline) - now; %>
+    <% const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); %>
+    <% return daysLeft; %>
+<% } %>
+<div class="container p-5">
+    <div class="container p-4">
+        <h1>Debt Writer Home Page</h1>
+        <p>Selamat datang di Debt Writer....</p>
+        <div class="row">
+            <div class="col-md-6">
                 <img src="/img/home-image.jpg" alt="note-images" class="m-3 img-thumbnail rounded-circle" width="200">
-                <p class="">Let's Write Your Debt...</p>
-                <br>
-                <div class="col-md-10">
-                    <a href="/notes" class="float-end btn btn-primary">Get Started &raquo;</a>                        
-                </div>      
+            </div>
+            <div class="col-md-6 d-flex flex-column justify-content-center">
+                <% if (cekSesi != null) { %>
+                    <% if (debts && debts.length > 0) { %>
+                        <% debts.forEach((debt, index) => { %>
+                            <div class="container">
+                                <div class="alert <%= calculateDaysLeft(debt.deadline) <= 0 ? 'alert-danger bg-danger' : 'alert-danger' %>" role="alert">
+                                    <a href="/notes/<%= debt._id %>" class="btn-link <%= calculateDaysLeft(debt.deadline) <= 0 ? 'text-white' : 'text-dark' %>"><% if (calculateDaysLeft(debt.deadline) <= 0) { %>
+                                     <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                                    <% } %> <%= debt.pemberi %> - hutang: <%= currencyFormatter.format(debt.jumlah, { locale: 'id-ID' }) %> - <%= calculateDaysLeft(debt.deadline) > 0 ? 'deadline: ' + calculateDaysLeft(debt.deadline) + ' hari lagi!' : 'Hutang sudah lewat tenggat!' %> &raquo;</a>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } %>
+                <% } %>
+                <a href="/notes" class="btn btn-primary mt-3 align-self-end">Get Started &raquo;</a>
             </div>
         </div>
     </div>
-
+</div>

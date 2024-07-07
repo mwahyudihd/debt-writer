@@ -14,6 +14,9 @@ const debtSchema = new mongoose.Schema({
         type: Schema.Types.Decimal128,
         required: [true, 'Jumlah hutang is required'],
     },
+    bunga: {
+        type: Number,
+    },
     tgl_hutang: {
         type: Date,
         required: [true, 'tanggal berhutang is required']

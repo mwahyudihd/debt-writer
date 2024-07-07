@@ -16,7 +16,7 @@
                 <input type=" text" value="<%= debt._id %>" name="_id" hidden readonly>
                 <div class="mb-3 form-floating">
                     <input type="date" class="form-control" placeholder="lunas_pada" id="lunas_pada"
-                        name="Tanggal lunas" value="<%= dateFormat %>" required>
+                        name="lunas_pada" value="<%= dateFormat %>" required>
                     <label for="lunas_pada" class="form-label">Tanggal lunas</label>
                 </div>
                 <% if (debt.status === "unpaid" ) { %>

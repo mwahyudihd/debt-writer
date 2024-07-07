@@ -1,0 +1,82 @@
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-12 card m-2 p-3">
+            <h2>Form Tambah catatan Hutang</h2>
+            <form method="post" action="/notes/<%= debt._id %>?_method=PUT">
+                <input type="text" name="_id" id="_id" value="<%= debt._id %>" hidden readonly>
+                <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" placeholder="Pemberi" id="pemberi" name="pemberi" value="<%= debt.pemberi %>" required>
+                    <label for="pemberi" class="form-label">Nama Pemberi Hutang</label>
+                </div>
+                <div class="mb-3 form-floating">
+                  <input type="number" id="jumlah" name="jumlah" placeholder="jumlah" value="<%= debt.jumlah %>" class="form-control" required>
+                  <label for="jumlah" class="form-label">Jumlah Hutang</label>
+                </div>
+                <% if (debt.bunga != null) { %>
+                    <div class="row g-3 mb-2" id="interestBlock">
+                        <div class="col-auto form-floating">
+                            <input type="number" name="bunga" class="form-control" id="interest" placeholder="Bunga" value="<%= debt.bunga %>">
+                            <label for="interest">Bunga</label>
+                          </div>
+                          <div class="col-auto float-center">
+                            <h4 class="mt-3">%</h4>
+                          </div>
+                          <div class="col-auto float-end">
+                            <a class="btn btn-danger" onclick="removeInterest()"><i class="bi bi-dash-circle-fill"></i></a>
+                          </div>
+                    </div>
+                <% } else { %>
+                <div class="row g-3 mb-2 disable" id="interestBlock">
+                    <div class="col-auto form-floating">
+                        <input type="number" name="bunga" class="form-control" id="interest" placeholder="Bunga">
+                        <label for="interest">Bunga</label>
+                      </div>
+                      <div class="col-auto float-center">
+                        <h4 class="mt-3">%</h4>
+                      </div>
+                      <div class="col-auto float-end">
+                        <a class="btn btn-danger" onclick="removeInterest()"><i class="bi bi-dash-circle-fill"></i></a>
+                      </div>
+                </div>
+                <% } %>
+                <div class="mb-3 form-floating">
+                    <input type="date" class="form-control" value="<%= dateStart %>" placeholder="Tanggal Hutang" id="tgl_hutang" name="tgl_hutang">
+                    <label for="tgl_hutang" class="form-label">Tanggal Berhutang</label>
+                </div>
+                
+                <div class="mb-3 form-floating">
+                    <input type="date" class="form-control" value="<%= deadline %>" placeholder="deadline" id="deadline" name="deadline">
+                    <label for="deadline" class="form-label">Tanggal Jatuh Tempo</label>
+                </div>
+                <div class="form-floating mt-3">
+                    <textarea class="form-control" name="catatan" placeholder="Leave a comment here" id="catatan"><%= debt.catatan %></textarea>
+                    <label for="catatan">Catatan Optional</label>
+                  </div>
+                <% if (debt.bunga != null) { %>
+                    <a id="interestSet" class="btn btn-dark mt-2 disable" onclick="addInterest()">Bunga <i class="bi bi-plus-circle-fill"></i></a>
+                <% } else { %>
+                    <a id="interestSet" class="btn btn-dark mt-2" onclick="addInterest()">Bunga <i class="bi bi-plus-circle-fill"></i></a>
+                <% } %>
+                <a href="/notes/<%= debt._id %>" class="mt-2 btn btn-success float-center">&laquo; Kembali</a>
+                <button type="submit" class="btn btn-primary float-end mt-3">Simpan</button>
+              </form>
+        </div>
+    </div>
+</div>
+<style>
+    .disable{
+        display: none;
+    }
+</style>
+<script>
+    const inputColumn = document.getElementById("interestBlock")
+    const buttonAdd = document.getElementById("interestSet")
+    function addInterest(){
+        inputColumn.classList.remove("disable")
+        buttonAdd.classList.add("disable")
+    }
+    function removeInterest(){
+        inputColumn.classList.add("disable")
+        buttonAdd.classList.remove("disable")
+    }
+</script>

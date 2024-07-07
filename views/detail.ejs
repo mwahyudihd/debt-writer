@@ -15,7 +15,7 @@
                             <div class="card-body">
                                 <h5 class="card-title">Pemberi Hutang : <%= debt.pemberi %>
                                 </h5>
-                                <h6 class="card-subtitle mb-2 text-body-secondary">Total : Rp.<%= debt.jumlah %>
+                                <h6 class="card-subtitle mb-2 text-body-secondary">Total : <%= debtCount %>
                                 </h6>
                                 <ul>
                                     <li>
@@ -23,41 +23,79 @@
                                         </p>
                                     </li>
                                     <li>
-                                        <p>Jatuh Tempo : <%= formattedDeadline %></p>
+                                        <p>Jatuh Tempo : <%= formattedDeadline %>
+                                        </p>
                                     </li>
+                                    <% if(debt.bunga !=null) { %>
+                                        <li>
+                                            <p>Jumlah Bunga : <%= debt.bunga %>% : <%= preDebtTotal %>
+                                            </p>
+                                        </li>
+                                        <% } %>
+                                            <% if (debt.status !='unpaid' ) { %>
+                                                <li>
+                                                    <p>Lunas pada : <%= paidDate %>
+                                                    </p>
+                                                </li>
+                                                <% } %>
                                 </ul>
-                                <% if (debt.status === 'unpaid') { %>
-                                    <a href="/notes/status/<%= debt._id %>" class="badge bg-danger rounded-pill">
+                                <p>Status :</p>
+                                <% if (debt.status==='unpaid' ) { %>
+                                    <a href="/notes/status/<%= debt._id %>"
+                                        class="btn text-white bg-danger rounded-pill mb-2">
                                         <%= debt.status %>
                                     </a>
-                                <% }else {%>
-                                    <a href="/notes/status/<%= debt._id %>" class="badge bg-primary rounded-pill">
-                                        <%= debt.status %>
-                                    </a>
-                                <% } %>
-                                <div class="container d-flex col-md-8">
-                                    <a href="/notes/edit/<%= debt._id %>"
-                                        class="col-md-4 flex-start btn btn-info rounded-pill badge"><i
-                                            class="bi bi-pencil-square"></i> Ubah </a>
-                                    <!-- <a href="/notes/delete/ contact.nama " onclick="return confirm('Yakin Ingin menghapus?')" class="flex-end btn btn-danger rounded-pill badge"><i class="bi bi-trash3-fill"></i> Delete </a> -->
-                                    <form action="/notes?_method=DELETE" method="POST">
-                                        <input type="text" hidden name="_id" value="<%= debt._id %>">
-                                        <button type="submit" onclick="return confirm('Yakin Ingin menghapus?')"
-                                            class="flex-end btn btn-danger rounded-pill badge"><i
-                                                class="bi bi-trash3-fill"></i> Delete</button>
-                                    </form>
-                                </div>
-                                <a href="/notes" class="flex-start card-link">&laquo; Kembali</a>
+                                    <% }else {%>
+                                        <a href="/notes/status/<%= debt._id %>"
+                                            class="btn text-white bg-primary rounded-pill mb-2">
+                                            <%= debt.status %>
+                                        </a>
+                                        <% } %>
+                                            <div class="card-footer">
+                                                <div class="container">
+                                                    <a href="/notes"
+                                                        class="float-start card-link btn btn-success">&laquo;
+                                                        Kembali</a>
+
+                                                    <a href="/notes/edit/<%= debt._id %>"
+                                                        class="float-end text-white btn btn-dark mb-2"><i
+                                                            class="bi bi-pencil-square"></i> Ubah </a>
+                                                </div>
+                                            </div>
                             </div>
                         </div>
                         <div class="flex-wrap border border-white border-5"> </div>
                         <div class="card flex-wrap" style="width: 25rem;">
-                            <div class="card-body">
-                                <h5 class="card-title">Catatan</h5>
-                                <h6 class="card-subtitle mb-2 text-body-secondary">catatan optional</h6>
-                                <p class="card-text">
-                                    <%= debt.catatan %>
-                                </p>
+                            <div class="card-body d-flex flex-column">
+                                <div class="p-2 d-flex justify-content-center">
+                                    <h5 class="card-title">Catatan</h5>
+                                </div>
+                                <div class="p-2 d-flex justify-content-center">
+                                    <h6 class="card-subtitle mb-2 text-body-secondary flex-wrap">catatan optional</h6>
+                                </div>
+                                <div class="p-2">
+                                    <p class="card-text">
+                                        <%= debt.catatan %>
+                                    </p>
+                                </div>
+                                <% if (debt.status==='paid' ) { %>
+                                    <div class="p-2 d-flex justify-content-center">
+                                        <div id="stamp" class="stamp rubber text-center float-center">LUNAS</div>
+                                    </div>
+                                    <% } %>
+                            </div>
+                            <div class="card-footer">
+                                <div class="container">
+                                    <a href="/document/<%= debt._id %>" class="btn btn-primary"><i
+                                            class="bi bi-printer-fill"></i> Cetak</a>
+
+                                    <form action="/notes?_method=DELETE" class="float-end" method="POST">
+                                        <input type="text" hidden name="_id" value="<%= debt._id %>">
+                                        <button type="submit" onclick="return confirm('Yakin Ingin menghapus?')"
+                                            class="flex-end btn btn-danger"><i class="bi bi-trash3-fill"></i>
+                                            Delete</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -65,3 +103,80 @@
         </div>
     </div>
 </div>
+<style>
+    body {
+        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABZ0RVh0Q3JlYXRpb24gVGltZQAxMC8yOS8xMiKqq3kAAAAcdEVYdFNvZnR3YXJlAEFkb2JlIEZpcmV3b3JrcyBDUzVxteM2AAABHklEQVRIib2Vyw6EIAxFW5idr///Qx9sfG3pLEyJ3tAwi5EmBqRo7vHawiEEERHS6x7MTMxMVv6+z3tPMUYSkfTM/R0fEaG2bbMv+Gc4nZzn+dN4HAcREa3r+hi3bcuu68jLskhVIlW073tWaYlQ9+F9IpqmSfq+fwskhdO/AwmUTJXrOuaRQNeRkOd5lq7rXmS5InmERKoER/QMvUAPlZDHcZRhGN4CSeGY+aHMqgcks5RrHv/eeh455x5KrMq2yHQdibDO6ncG/KZWL7M8xDyS1/MIO0NJqdULLS81X6/X6aR0nqBSJcPeZnlZrzN477NKURn2Nus8sjzmEII0TfMiyxUuxphVWjpJkbx0btUnshRihVv70Bv8ItXq6Asoi/ZiCbU6YgAAAABJRU5ErkJggg==);
+    }
+
+    .error-template {
+        padding: 40px 15px;
+        text-align: center;
+    }
+
+    .error-actions {
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .error-actions .btn {
+        margin-right: 10px;
+    }
+
+    .btn-link {
+        border: none;
+        outline: none;
+        background: none;
+        cursor: pointer;
+        color: #ffa2a2;
+        padding: 0;
+        margin-top: 0.5rem;
+        text-decoration: none;
+        font-family: inherit;
+        font-size: inherit;
+    }
+
+    .btn-link:hover {
+        color: #ffefef;
+    }
+
+    #stamp {
+        box-sizing: border-box;
+    }
+
+    .stamp {
+        position: relative;
+        display: inline-block;
+        color: blue;
+        padding: 15px;
+        background-color: white;
+        box-shadow: inset 0px 0px 0px 10px blue;
+    }
+
+    .stamp::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("http://i.imgur.com/5O74VI6.jpg");
+        mix-blend-mode: lighten;
+    }
+
+    .rubber {
+        box-shadow: 0 0 0 3px blue, 0 0 0 2px blue inset;
+        border: 2px solid transparent;
+        border-radius: 4px;
+        display: inline-block;
+        padding: 5px 2px;
+        line-height: 22px;
+        color: blue;
+        font-size: 24px;
+        font-family: 'Black Ops One', cursive;
+        text-transform: uppercase;
+        text-align: center;
+        opacity: 0.4;
+        width: 155px;
+        transform: rotate(-5deg);
+    }
+</style>

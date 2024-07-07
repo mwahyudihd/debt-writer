@@ -22,6 +22,16 @@
                   <input type="number" id="jumlah" name="jumlah" placeholder="jumlah" class="form-control" required>
                   <label for="jumlah" class="form-label">Jumlah Hutang</label>
                 </div>
+                <div class="row g-3 mb-2 disable" id="interestBlock">
+                    <div class="col-auto form-floating">
+                        <input type="number" name="bunga" class="form-control" id="interest" placeholder="Bunga">
+                        <label for="interest">Bunga</label>
+                      </div>
+                      %
+                      <div class="col-auto float-end">
+                        <a class="btn btn-danger" onclick="removeInterest()"><i class="bi bi-dash-circle-fill"></i></a>
+                      </div>
+                </div>
                 <div class="mb-3 form-floating">
                     <input type="date" class="form-control" placeholder="Tanggal Hutang" id="tgl_hutang" name="tgl_hutang">
                     <label for="tgl_hutang" class="form-label">Tanggal Berhutang</label>
@@ -35,9 +45,26 @@
                     <label for="catatan">Catatan Optional</label>
                   </div>
                 <input type="text" class="form-control" name="status" value="unpaid" readonly hidden>
-
+                <a id="interestSet" class="btn btn-dark mt-2" onclick="addInterest()">Bunga <i class="bi bi-plus-circle-fill"></i></a>
                 <button type="submit" class="btn btn-primary float-end mt-3">Simpan</button>
               </form>
         </div>
     </div>
 </div>
+<style>
+    .disable{
+        display: none;
+    }
+</style>
+<script>
+    const inputColumn = document.getElementById("interestBlock")
+    const buttonAdd = document.getElementById("interestSet")
+    function addInterest(){
+        inputColumn.classList.remove("disable")
+        buttonAdd.classList.add("disable")
+    }
+    function removeInterest(){
+        inputColumn.classList.add("disable")
+        buttonAdd.classList.remove("disable")
+    }
+</script>

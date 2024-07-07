@@ -10,6 +10,10 @@ const session = require('express-session')
 const expressLayouts = require('express-ejs-layouts')
 const { body, validationResult, check, Result } = require('express-validator')
 const methodOverride = require('method-override')
+const currencyFormatter = require('currency-formatter')
+const date = require('date-and-time')
+const moment = require('moment')
+const _ = require('lodash')
 require('dotenv').config()
 
 //server init
@@ -63,13 +67,35 @@ app.use(cookieParser('secret'))
 app.use(flash())
 
 //index
-app.get('/', (req, res) => {
-    res.render('index', {
-        cekSesi: req.session.user_id,
-        title: 'Home Page',
-        layout: './layouts/main-layout'
-    })
-})
+app.get('/', async (req, res) => {
+    try {
+        const now = new Date();
+        const limitDate = new Date(now);
+        limitDate.setDate(now.getDate() + 5);
+
+        let debts = [];
+        if (req.session.user_id != null) {
+            debts = await Debt.find({
+                pencatat: req.session.user_id,
+                deadline: { $lt: limitDate },
+                status: 'unpaid'
+            });
+        }
+
+        res.render('index', {
+            debts,
+            cekSesi: req.session.user_id,
+            title: 'Home Page',
+            layout: './layouts/main-layout',
+            currencyFormatter
+        });
+    } catch (err) {
+        console.log(err);
+        res.redirect('/404');
+    }
+});
+
+
 
 //form debt
 app.get('/notes/add', auth, (req, res) => {
@@ -84,14 +110,19 @@ app.get('/notes/add', auth, (req, res) => {
 app.get('/notes/:_id', auth, async (req, res) => {
     try {
         const debt = await Debt.findOne({ _id: req.params._id })
-        const tgl_hutang = debt.tgl_hutang
-        const deadlined = debt.deadline
-        let formattedDate = tgl_hutang.toLocaleDateString('id-ID', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })
-        let formattedDeadline = deadlined.toLocaleDateString('id-ID', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+        const interestSet = _.divide(debt.bunga, 100)
+        const preDebtTotal = debt.jumlah * interestSet
+        let paidDate
+        if (debt.lunas_pada != null) {
+            paidDate = moment(debt.lunas_pada).locale('id').format('ddd, DD MMM YYYY')
+        } else paidDate = null
         res.render('detail', {
+            preDebtTotal: currencyFormatter.format(preDebtTotal, { locale: 'id-ID' }),
+            debtCount: currencyFormatter.format(debt.jumlah, { locale: 'id-ID' }),
             cekSesi: req.session.user_id,
-            formattedDeadline,
-            formattedDate,
+            paidDate,
+            formattedDeadline: moment(debt.deadline).locale('id').format('ddd, DD MMM YYYY'),
+            formattedDate: moment(debt.tgl_hutang).locale('id').format('ddd, DD MMM YYYY'),
             debt,
             title: 'Debt Detail',
             layout: './layouts/main-layout'
@@ -147,11 +178,30 @@ app.post('/register', body('username').custom(async (value) => {
 //adding data process
 app.post('/notes', async (req, res) => {
     const { pencatat, pemberi, jumlah, tgl_hutang, deadline, catatan, status } = req.body
-    const debt = new Debt({ pencatat, pemberi, jumlah, tgl_hutang, deadline, catatan, status })
-    await debt.save()
-    req.flash('msg', 'Data Hutang Berhasil ditambahkan!')
-    res.redirect('/notes')
+    let { bunga } = req.body
+
+    if (!bunga) {
+        bunga = undefined
+    }
+
+    const debtData = { pencatat, pemberi, jumlah, tgl_hutang, deadline, catatan, status }
+
+    if (bunga !== undefined) {
+        debtData.bunga = bunga
+    }
+
+    const debt = new Debt(debtData)
+
+    try {
+        await debt.save()
+        req.flash('msg', 'Data Hutang Berhasil ditambahkan!')
+        res.redirect('/notes')
+    } catch (error) {
+        console.log(error)
+        res.redirect('/404')
+    }
 })
+
 
 app.get('/register', notAuth, (req, res) => {
     res.render('register', {
@@ -197,13 +247,8 @@ app.get('/notes', auth, async (req, res) => {
 app.get('/notes/status/:_id', auth, async (req, res) => {
     try {
         const debt = await Debt.findOne({ _id: req.params._id })
-        const dateNow = new Date()
-        let day = dateNow.getDate();
-        let month = dateNow.getMonth() + 1
-        let year = dateNow.getFullYear()
-        if (day < 10) day = '0' + day
-        if (month < 10) month = '0' + month
-        let dateFormat = year + '-' + month + '-' + day;
+        const now = new Date();
+        const dateFormat = date.format(now, 'YYYY-MM-DD');
         res.render('status', {
             cekSesi: req.session.user_id,
             dateFormat,
@@ -212,29 +257,113 @@ app.get('/notes/status/:_id', auth, async (req, res) => {
             layout: './layouts/main-layout'
         })
     } catch (error) {
+        console.log(error)
         res.redirect('/404')
     }
 })
 
-app.put('/notes', (req, res) => {
-    Debt.updateOne(
-        {
-            _id: req.body._id
-        },
-        {
-            $set: {
-                lunas_pada: req.body.lunas_pada,
-                status: req.body.status
-            }
+app.get('/notes/edit/:_id', auth, async (req, res) => {
+    try {
+        const debt = await Debt.findOne({ _id: req.params._id })
+        const dateStart = date.format(debt.tgl_hutang, 'YYYY-MM-DD')
+        const deadline = date.format(debt.deadline, 'YYYY-MM-DD')
+
+        res.render('edit-note', {
+            cekSesi: req.session.user_id,
+            dateStart,
+            deadline,
+            debt,
+            title: 'Edit - debt',
+            layout: './layouts/main-layout'
+        })
+    } catch (error) {
+        console.log(error)
+        res.redirect('/404')
+    }
+})
+
+app.get('/document/:_id', auth, async (req, res) => {
+    try {
+        const debt = await Debt.findOne({ _id: req.params._id })
+        const interestSet = _.divide(debt.bunga, 100)
+        const preDebtTotal = debt.jumlah * interestSet
+        const countDebt = parseInt(debt.jumlah) + parseInt(preDebtTotal)
+        res.render('document', {
+            debtCount: currencyFormatter.format(debt.jumlah, { locale: 'id-ID' }),
+            userName: req.session.name_user,
+            preDebtTotal: currencyFormatter.format(preDebtTotal, { locale: 'id-ID' }),
+            countDebt: currencyFormatter.format(countDebt, { locale: 'id-ID' }),
+            formattedDeadline: moment(debt.deadline).locale('id').format('ddd, DD MMM YYYY'),
+            formattedDate: moment(debt.tgl_hutang).locale('id').format('ddd, DD MMM YYYY'),
+            formattedPaid: moment(debt.lunas_pada).locale('id').format('ddd, DD MMM YYYY'),
+            debt,
+            title: 'Invoice',
+            layout: 'document'
+        })
+    } catch (e) {
+        res.redirect('/404')
+    }
+})
+
+app.put('/notes/:_id', (req, res) => {
+    if (req.body.status === 'paid' || req.body.status === 'unpaid') {
+        Debt.updateOne(
+            {
+                _id: req.body._id
+            },
+            {
+                $set: {
+                    lunas_pada: req.body.lunas_pada,
+                    status: req.body.status
+                }
+            }).then((result) => {
+                //pesan singkat /flash message
+                req.flash('msg', `Status hutang ${req.body.pemberi} Berhasil diubah!`)
+
+                res.redirect('/notes')
+            })
+    } else {
+        if (req.body.bunga != null || typeof req.body.bunga != undefined) {
+            Debt.updateOne(
+                {
+                    _id: req.body._id
+                },
+                {
+                    $set: {
+                        pemberi: req.body.pemberi,
+                        jumlah: req.body.jumlah,
+                        bunga: req.body.bunga,
+                        tgl_hutang: req.body.tgl_hutang,
+                        deadline: req.body.deadline,
+                        catatan: req.body.catatan
+                    }
+                }).then((result) => {
+                    //pesan singkat /flash message
+                    req.flash('msg', `Status hutang ${req.body.pemberi} Berhasil diubah!`)
+
+                    res.redirect('/notes')
+                })
+        } else {
+            Debt.updateOne(
+                {
+                    _id: req.body._id
+                },
+                {
+                    $set: {
+                        pemberi: req.body.pemberi,
+                        jumlah: req.body.jumlah,
+                        tgl_hutang: req.body.tgl_hutang,
+                        deadline: req.body.deadline,
+                        catatan: req.body.catatan
+                    }
+                }).then((result) => {
+                    //pesan singkat /flash message
+                    req.flash('msg', `Status hutang ${req.body.pemberi} Berhasil diubah!`)
+
+                    res.redirect('/notes')
+                })
         }
-    ).then((result) => {
-        //pesan singkat /flash message
-        req.flash('msg', `Status hutang ${req.body.pemberi} Berhasil diubah!`)
-
-        res.redirect('/notes')
-    })
-
-
+    }
 })
 
 app.post('/logout', auth, (req, res) => {
