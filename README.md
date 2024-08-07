@@ -1,43 +1,44 @@
-# Website Pencatatan Hutang Pribadi
+# Personal Debt Recording Website
 
-Proyek ini adalah aplikasi web untuk mencatat hutang pribadi menggunakan Express.js sebagai backend dan MongoDB sebagai basis datanya. Proyek ini dibuat untuk menyelesaikan tugas mata kuliah Basisdata Lanjutan.
+This project is a web application for recording personal debts. It uses Express.js as the backend and MongoDB as its database. The project was created to fulfill the requirements of an Advanced Database course.
 
-## Fitur
+## Features
 
-- Pencatatan hutang baru
-- Pembaruan status hutang
-- Penghapusan catatan hutang
-- Pencarian dan penyaringan catatan hutang
-- Autentikasi pengguna
+- Adding new debt records
+- Updating debt status
+- Deleting debt records
+- Searching and filtering debt records
+- User authentication
 
-## Persyaratan
-- Mongo db
-    - Pastikan database db_debtwriter telah dibuat sebelum menjalankan program
-- Node Js
+## Requirements
+- MongoDB
+    - Make sure the `db_debtwriter` database is created before running the program.
+- Node.js
 
-## Teknologi yang Digunakan
+## Technologies Used
 
 - Node.js
 - Express.js
 - MongoDB
 - Mongoose
-- Bcrypt (untuk encryptions)
-- EJS (untuk tampilan)
+- Bcrypt (for encryption)
+- EJS (for views)
 
-## Instalasi
+## Installation
 
-1. Clone repositori ini
+1. Clone this repository:
 
    ```bash
    git clone https://github.com/username/repo-name.git
-   ```
 
 ## Running program
-1. Buka teminal di direktori nya kemudian ketikan :
+1. Open your terminal on the directory with command :
 
     ```bash
     npm run dev
     ```
-## Lisensi
+## License
 
-Proyek ini dilisensikan di bawah MIT License - lihat file [LICENSE](LICENSE) untuk detail lebih lanjut.
+This project is licensed under the MIT License - see: 
+
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
